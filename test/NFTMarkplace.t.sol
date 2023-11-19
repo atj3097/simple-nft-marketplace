@@ -80,18 +80,33 @@ contract NFTMarketplaceTest is Test {
     }
 
     function testCancelOrder() public {
-        IERC721(address(nft)).approve(address(marketplace), 1);
-        marketplace.sell(1, address(nft), 1, price, block.timestamp + 150);
+        address fakeSeller = address(0x6);
 
-        (, address seller, bool isSold, , , , ) = marketplace.orders(1);
-        assertTrue(seller == address(this));
+        vm.prank(fakeSeller);
+        uint256 tokenTest = nft.mintNFT(fakeSeller, "image url");
+
+        vm.prank(fakeSeller);
+        IERC721(address(nft)).approve(address(marketplace), tokenTest);
+
+        uint256 orderId = 1;
+        uint256 price = 10 ether;
+        uint256 expiration = block.timestamp + 1 days;
+        vm.prank(fakeSeller);
+        marketplace.sell(orderId, address(nft), tokenTest, price, expiration);
+
+        (uint256 id, address seller, bool isSold, , , , uint256 expiresAt) = marketplace.orders(orderId);
+        assertTrue(id == orderId);
+        assertTrue(seller == fakeSeller);
         assertTrue(isSold == false);
+        assertTrue(expiresAt == expiration);
 
-        marketplace.cancel(1);
+        vm.prank(fakeSeller);
+        marketplace.cancel(orderId);
 
-        (, , bool isSoldAfter, , , , ) = marketplace.orders(1);
-        assertTrue(isSoldAfter == true);
+        (id, seller, isSold, , , , expiresAt) = marketplace.orders(orderId);
+        assertTrue(seller == address(0));
     }
+
 
 
 
