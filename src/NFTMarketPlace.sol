@@ -18,7 +18,12 @@ they don't transfer the NFT to the marketplace.
 
 contract NFTMarketplace {
 
-
+    struct Order {
+        uint256 id;
+        address seller;
+        bool isSold;
+        uint256 price;
+    }
 
 
 
