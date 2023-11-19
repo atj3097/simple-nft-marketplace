@@ -41,12 +41,14 @@ contract NFTMarketplaceTest is Test {
     function testSellNFT() public {
         marketplace.sell(1, address(nft), 1, price, block.timestamp + 150);
 
-        assertTrue(marketplace.orders(1).seller == address(this));
-        assertTrue(marketplace.orders(1).isSold == false);
-        assertTrue(marketplace.orders(1).price == 1);
-        assertTrue(marketplace.orders(1).nftContract == address(this));
-        assertTrue(marketplace.orders(1).tokenId == 1);
-        assertTrue(marketplace.orders(1).expiresAt > block.timestamp);
+        (, address seller, bool isSold, uint256 price, address nftContract, uint256 tokenId, uint256 expiresAt) = marketplace.orders(1);
+
+        assertTrue(seller == address(this));
+        assertTrue(isSold == false);
+        assertTrue(price == 1);
+        assertTrue(nftContract == address(this));
+        assertTrue(tokenId == 1);
+        assertTrue(expiresAt > block.timestamp);
     }
 
 
