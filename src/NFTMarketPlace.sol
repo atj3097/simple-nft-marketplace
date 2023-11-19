@@ -14,7 +14,7 @@ Corner cases:
 What if the seller lists the same NFT twice? This can theoretically happen since
 they don't transfer the NFT to the marketplace.
 */
-
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 contract NFTMarketplace {
 
@@ -34,6 +34,8 @@ contract NFTMarketplace {
         require(orders[id].isSold == false, "This order has already been sold");
         require(orders[id].seller == address(0), "This order has already been created");
         orders[id] = Order(id, msg.sender, false, price, nftContract, tokenId);
+        IERC721(nftContract).approve(address(this), tokenId);
+        IERC721(nftContract).allowance(msg.sender, address(this));
     }
 
     function cancel(uint256 id) external {
