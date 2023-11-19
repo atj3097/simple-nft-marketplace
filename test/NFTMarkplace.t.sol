@@ -79,6 +79,20 @@ contract NFTMarketplaceTest is Test {
         assertTrue(isSoldAfter == true);
     }
 
+    function testCancelOrder() public {
+        IERC721(address(nft)).approve(address(marketplace), 1);
+        marketplace.sell(1, address(nft), 1, price, block.timestamp + 150);
+
+        (, address seller, bool isSold, , , , ) = marketplace.orders(1);
+        assertTrue(seller == address(this));
+        assertTrue(isSold == false);
+
+        marketplace.cancel(1);
+
+        (, , bool isSoldAfter, , , , ) = marketplace.orders(1);
+        assertTrue(isSoldAfter == true);
+    }
+
 
 
 
