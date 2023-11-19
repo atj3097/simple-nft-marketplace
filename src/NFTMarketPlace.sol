@@ -38,9 +38,9 @@ contract NFTMarketplace {
         require(IERC721(nftContract).ownerOf(tokenId) == msg.sender, "You are not the owner of this NFT");
         require(expiration > block.timestamp, "Expiration must be in the future");
         require(alreadySold(tokenId) == false, "This NFT is already for sale");
+        require(IERC721(nftContract).getApproved(tokenId) == address(this), "Contract must be approved to transfer the NFT");
         orders[id] = Order(id, msg.sender, false, price, nftContract, tokenId, expiration);
         orderTokenIds.push(tokenId);
-        IERC721(nftContract).approve(address(this), tokenId);
     }
 
     function purchase(uint256 id) external payable {

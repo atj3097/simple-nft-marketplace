@@ -39,6 +39,7 @@ contract NFTMarketplaceTest is Test {
     }
 
     function testSellNFT() public {
+        IERC721(address(nft)).approve(address(marketplace), 1);
         marketplace.sell(1, address(nft), 1, price, block.timestamp + 150);
 
         (, address seller, bool isSold, uint256 price, address nftContract, uint256 tokenId, uint256 expiresAt) = marketplace.orders(1);
