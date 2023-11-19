@@ -36,6 +36,12 @@ contract NFTMarketplace {
         orders[id] = Order(id, msg.sender, false, price, nftContract, tokenId);
     }
 
+    function cancel(uint256 id) external {
+        require(orders[id].seller == msg.sender, "You are not the seller of this order");
+        require(orders[id].isSold == false, "This order has already been sold");
+        delete orders[id];
+    }
+
 
 
 
