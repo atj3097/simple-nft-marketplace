@@ -52,5 +52,25 @@ contract NFTMarketplaceTest is Test {
         assertTrue(expiresAt > block.timestamp);
     }
 
+    function testPurchaseNFT() public payable {
+
+        address fakeAddress = address(0x5);
+        IERC721(address(nft)).approve(address(marketplace), 1);
+        marketplace.sell(1, address(nft), 1, price, block.timestamp + 150);
+
+        vm.prank(fakeAddress);
+        vm.deal(fakeAddress, 75);
+        marketplace.purchase{value: 20}(1);
+
+        (, address seller, bool isSold, uint256 price, address nftContract, uint256 tokenId, uint256 expiresAt) = marketplace.orders(1);
+
+        assertTrue(seller == address(this));
+        assertTrue(isSold == true);
+        assertTrue(price == 20);
+        assertTrue(nftContract == address(nft));
+        assertTrue(tokenId == 1);
+        assertTrue(expiresAt > block.timestamp);
+    }
+
 
 }
