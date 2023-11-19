@@ -40,6 +40,16 @@ contract NFTMarketplace {
         IERC721(nftContract).approve(address(this), tokenId);
     }
 
+    function purchase(uint256 id) external payable {
+        require(orders[id].isSold == false, "This order has already been sold");
+        require(orders[id].seller != address(0), "This order does not exist");
+        require(orders[id].expiresAt > block.timestamp, "This order has expired");
+        require(msg.value == orders[id].price, "You must pay the exact price");
+        orders[id].isSold = true;
+        IERC721(orders[id].nftContract).transferFrom(orders[id].seller, msg.sender, orders[id].tokenId);
+        payable(orders[id].seller).transfer(msg.value);
+    }
+
     function cancel(uint256 id) external {
         require(orders[id].seller == msg.sender, "You are not the seller of this order");
         require(orders[id].isSold == false, "This order has already been sold");
