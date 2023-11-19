@@ -53,18 +53,39 @@ contract NFTMarketplaceTest is Test {
     }
 
     function testPurchaseNFT() public payable {
-
         address fakeAddress = address(0x5);
-        IERC721(address(nft)).approve(address(marketplace), 1);
-        marketplace.sell(1, address(nft), 1, price, block.timestamp + 150);
+        address fakeSeller = address(0x6);
 
-        (, address seller, bool isSold, uint256 price, address nftContract, uint256 tokenId, uint256 expiresAt) = marketplace.orders(1);
-        vm.deal(fakeAddress, 75);
+        // Mint NFT
+        vm.prank(fakeSeller);
+        uint256 tokenTest = nft.mintNFT(fakeSeller, "image url");
+
+        // Approve marketplace to transfer NFT
+        vm.prank(fakeSeller);
+        IERC721(address(nft)).approve(address(marketplace), tokenTest);
+
+        // Sell NFT
+        vm.prank(fakeSeller);
+        marketplace.sell(2, address(nft), tokenTest, price, block.timestamp + 150);
+
+        // Fetch and assert order details before purchase
+        (, address seller, bool isSoldBefore, , , , uint256 expiresAt) = marketplace.orders(2);
+        assertTrue(seller == fakeSeller);
+        assertTrue(isSoldBefore == false);
+        assertTrue(expiresAt > block.timestamp);
+
+        // Ensure fakeAddress has enough Ether and make the purchase
+        vm.deal(fakeAddress, 100);
         vm.prank(fakeAddress);
-        marketplace.purchase{value: 20}(1);
+        vm.warp(block.timestamp + 100);
+        marketplace.purchase{value: 20}(2); // Use consistent order ID
 
-        assertTrue(isSold == true);
+        // Fetch and assert order details after purchase
+        (, , bool isSoldAfter, , , , ) = marketplace.orders(2); // Use consistent order ID
+        assertTrue(isSoldAfter == true);
     }
+
+
 
 
 }
