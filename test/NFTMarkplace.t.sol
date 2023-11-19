@@ -59,8 +59,6 @@ contract NFTMarketplaceTest is Test {
         marketplace.sell(1, address(nft), 1, price, block.timestamp + 150);
 
         (, address seller, bool isSold, uint256 price, address nftContract, uint256 tokenId, uint256 expiresAt) = marketplace.orders(1);
-
-
         vm.deal(fakeAddress, 75);
         vm.prank(fakeAddress);
         marketplace.purchase{value: 20}(1);
