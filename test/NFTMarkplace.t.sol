@@ -56,31 +56,25 @@ contract NFTMarketplaceTest is Test {
         address fakeAddress = address(0x5);
         address fakeSeller = address(0x6);
 
-        // Mint NFT
         vm.prank(fakeSeller);
         uint256 tokenTest = nft.mintNFT(fakeSeller, "image url");
 
-        // Approve marketplace to transfer NFT
         vm.prank(fakeSeller);
         IERC721(address(nft)).approve(address(marketplace), tokenTest);
 
-        // Sell NFT
         vm.prank(fakeSeller);
         marketplace.sell(2, address(nft), tokenTest, price, block.timestamp + 150);
 
-        // Fetch and assert order details before purchase
         (, address seller, bool isSoldBefore, , , , uint256 expiresAt) = marketplace.orders(2);
         assertTrue(seller == fakeSeller);
         assertTrue(isSoldBefore == false);
         assertTrue(expiresAt > block.timestamp);
 
-        // Ensure fakeAddress has enough Ether and make the purchase
         vm.deal(fakeAddress, 100);
         vm.prank(fakeAddress);
         vm.warp(block.timestamp + 100);
-        marketplace.purchase{value: 20}(2); // Use consistent order ID
+        marketplace.purchase{value: 20}(2);
 
-        // Fetch and assert order details after purchase
         (, , bool isSoldAfter, , , , ) = marketplace.orders(2); // Use consistent order ID
         assertTrue(isSoldAfter == true);
     }
