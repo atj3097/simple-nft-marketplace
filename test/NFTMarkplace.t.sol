@@ -46,8 +46,8 @@ contract NFTMarketplaceTest is Test {
 
         assertTrue(seller == address(this));
         assertTrue(isSold == false);
-        assertTrue(price == 1);
-        assertTrue(nftContract == address(this));
+        assertTrue(price == 20);
+        assertTrue(nftContract == address(nft));
         assertTrue(tokenId == 1);
         assertTrue(expiresAt > block.timestamp);
     }
