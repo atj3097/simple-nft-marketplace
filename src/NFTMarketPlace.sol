@@ -36,6 +36,7 @@ contract NFTMarketplace {
         require(orders[id].seller == address(0), "This order has already been created");
         require(IERC721(nftContract).ownerOf(tokenId) == msg.sender, "You are not the owner of this NFT");
         require(expiration > block.timestamp, "Expiration must be in the future");
+        require(alreadySold(tokenId) == false, "This NFT is already for sale"))
         orders[id] = Order(id, msg.sender, false, price, nftContract, tokenId, expiration);
         IERC721(nftContract).approve(address(this), tokenId);
     }
@@ -54,6 +55,15 @@ contract NFTMarketplace {
         require(orders[id].seller == msg.sender, "You are not the seller of this order");
         require(orders[id].isSold == false, "This order has already been sold");
         delete orders[id];
+    }
+
+    function alreadySold(uint256 tokenId) external view returns (bool) {
+        for (uint256 i = 0; i < orders.length; i++) {
+            if (orders[i].tokenId == tokenId) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
