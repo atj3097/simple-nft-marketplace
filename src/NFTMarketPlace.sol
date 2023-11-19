@@ -29,6 +29,7 @@ contract NFTMarketplace {
     }
 
     mapping(uint256 => Order) public orders;
+    uint256[] public orderTokenIds;
 
     function sell(uint256 id, address nftContract, uint256 tokenId, uint256 price, uint256 expiration) external {
         require(price > 0, "Price must be at least 1 wei");
@@ -36,8 +37,9 @@ contract NFTMarketplace {
         require(orders[id].seller == address(0), "This order has already been created");
         require(IERC721(nftContract).ownerOf(tokenId) == msg.sender, "You are not the owner of this NFT");
         require(expiration > block.timestamp, "Expiration must be in the future");
-        require(alreadySold(tokenId) == false, "This NFT is already for sale"))
+        require(alreadySold(tokenId) == false, "This NFT is already for sale");
         orders[id] = Order(id, msg.sender, false, price, nftContract, tokenId, expiration);
+        orderTokenIds.push(tokenId);
         IERC721(nftContract).approve(address(this), tokenId);
     }
 
@@ -57,9 +59,9 @@ contract NFTMarketplace {
         delete orders[id];
     }
 
-    function alreadySold(uint256 tokenId) external view returns (bool) {
-        for (uint256 i = 0; i < orders.length; i++) {
-            if (orders[i].tokenId == tokenId) {
+    function alreadySold(uint256 tokenId) public view returns (bool) {
+        for (uint256 i = 0; i < orderTokenIds.length; i++) {
+            if (orderTokenIds[i] == tokenId) {
                 return true;
             }
         }
